@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Success Stories - OFFICIAL KUCCPS HUB</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            color: white;
+            background: linear-gradient(-45deg, #0b1b3a, #020617, #1e3a8a, #020617);
+            background-size: 400% 400%;
+            animation: gradientMove 15s ease infinite;
+            overflow-x: hidden;
+            line-height: 1.7;
+        }
+
+        @keyframes gradientMove {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            background: rgba(2, 6, 23, 0.9);
+        }
+
+        header h1 {
+            color: #38bdf8;
+        }
+
+        nav a {
+            margin-left: 15px;
+            color: white;
+            text-decoration: none;
+        }
+
+        nav a:hover {
+            color: #38bdf8;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 60px 20px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 16px;
+            margin-bottom: 50px;
+        }
+
+        .hero h2 {
+            font-size: 38px;
+            color: #22c55e;
+            margin-bottom: 12px;
+        }
+
+        .stories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 30px;
+        }
+
+        .story-card {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 28px;
+            transition: all 0.4s ease;
+            border: 1px solid rgba(56, 189, 248, 0.2);
+        }
+
+        .story-card:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 15px 35px rgba(56, 189, 248, 0.3);
+        }
+
+        .story-card img {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .story-card h3 {
+            color: #38bdf8;
+            margin-bottom: 8px;
+        }
+
+        .university {
+            color: #22c55e;
+            font-size: 15px;
+            margin-bottom: 15px;
+        }
+
+        .quote {
+            font-style: italic;
+            margin: 18px 0;
+            line-height: 1.8;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background: #facc15;
+            color: black;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            background: rgba(2, 6, 23, 0.9);
+            margin-top: 60px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>OFFICIAL KUCCPS HUB</h1>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="blog.html">Updates</a>
+            <a href="success-stories.html">Success Stories</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="hero">
+            <h2>Kenyan Student Success Stories</h2>
+            <p>Real stories from KCSE leavers who got placed in top Kenyan universities through KUCCPS</p>
+        </div>
+
+        <div class="stories-grid">
+            <!-- Story 1 -->
+            <div class="story-card">
+                <img src="images/success1.jpeg" alt="Jane Muthoni - Kenyan student">
+                <h3>Rianne Akoth</h3>
+                <div class="university">Technical University of Kenya(TUK) - Bachelor of Engineering (Aeronautical
+                    Engineering)</div>
+                <p class="quote">"OFFICIAL KUCCPS HUB gave me clear guidance on cluster points and important deadlines.
+                    I was
+                    able to secure my first choice in Aeronautical
+                    Engineering. Asante sana!"</p>
+                <small>KCSE 2024 • Score: A- • From Nairobi</small>
+            </div>
+
+            <!-- Story 2 -->
+            <div class="story-card">
+                <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2"
+                    alt="Kevin Omondi - Kenyan student">
+                <h3>Kevin Omondi</h3>
+                <div class="university">Moi University - Bachelor of Engineering</div>
+                <p class="quote">"The application tips and real-time updates helped me avoid mistakes. I got placed in
+                    Mechanical Engineering. This platform is a blessing for Form Four students!"</p>
+                <small>KCSE 2024 • Score: B+ • From Kisumu</small>
+            </div>
+
+            <!-- Story 3 -->
+            <div class="story-card">
+                <img src="https://images.unsplash.com/photo-1594736797933-d0501ba2fe65"
+                    alt="Achieng Otieno - Kenyan student">
+                <h3>Achieng Otieno</h3>
+                <div class="university">Kenyatta University - Bachelor of Education</div>
+                <p class="quote">"I was confused about course choices, but the success stories here gave me confidence.
+                    Now I'm studying what I love at Kenyatta University!"</p>
+                <small>KCSE 2024 • Score: B • From Kisii</small>
+            </div>
+
+            <!-- Story 4 -->
+            <div class="story-card">
+                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d"
+                    alt="Brian Kipchoge - Kenyan student">
+                <h3>Brian Kipchoge</h3>
+                <div class="university">Egerton University - Bachelor of Agriculture</div>
+                <p class="quote">"The revision of clusters and timely notifications helped me adjust my choices. I got
+                    my preferred course. Thank you KUCCPS HUB!"</p>
+                <small>KCSE 2024 • Score: B- • From Eldoret</small>
+            </div>
+        </div>
+
+        <div style="text-align:center; margin-top:50px;">
+            <button onclick="window.location.href='blog.html'" class="btn">Back to Latest Updates</button>
+        </div>
+    </div>
+
+</body>
+
+<!-- ===== FOOTER START ===== -->
+<footer class="main-footer">
+
+    <div class="footer-container">
+
+        <!-- LOGO + CONTACT -->
+        <div class="footer-col footer-brand">
+            <img src="images/logo.jpeg" alt="Logo" class="footer-logo">
+
+            <p><strong>OFFICIAL KUCCPS HUB</strong></p>
+            <p>Student Support Portal, Kenya</p>
+
+            <p>📍 Maseno, Kisumu County</p>
+            <p>📞 +254 112 118403</p>
+            <p>📧 officialkuccpshub.co.ke@gmail.com</p>
+        </div>
+
+        <!-- PROJECTS -->
+        <div class="footer-col">
+            <h3>Projects</h3>
+            <a href="#">KUCCPS Application Support</a>
+            <a href="#">Course Selection Guide</a>
+            <a href="#">University Placement Insights</a>
+            <a href="#">Student Mentorship</a>
+            <a href="#">Career Path Navigator</a>
+            <a href="#">Scholarship Matching</a>
+            <a href="#">Student Dashboard</a>
+            <a href="#">Parent Portal</a>
+            <a href="#">Edulum Students Portal</a>
+        </div>
+
+        <!-- QUICK LINKS -->
+        <div class="footer-col">
+            <h3>Quick Links</h3>
+            <a href="blog.html">Latest Updates</a>
+            <a href="contact.html">Contact Us</a>
+            <a href="privacy.html">Privacy Policy</a>
+            <a href="term.html">Terms & Conditions</a>
+            <a href="team.html">Our Teams</a>
+            <a href="success-stories.html">Success Stories</a>
+            <a href="student-dashboard.html">Student Dashboard</a>
+            <a href="parent-dashboard.html">Parent Dashboard</a>
+            <a href="help.html">Help Guidelines</a>
+            <a href="faq.html">FAQs</a>
+        </div>
+
+        <!-- RESOURCES -->
+        <div class="footer-col">
+            <h3>Resources</h3>
+            <a href="https://students.kuccps.net/login">KUCCPS Portal</a>
+            <a href="downloads.html">University Programmes</a>
+            <a href="#">Cut-off Points</a>
+            <a href="downloads.html">Downloads</a>
+            <a href="downloads.html">Guidelines</a>
+            <a href="downloads.html">Career Resources</a>
+            <a href="success-stories.html">Success Stories</a>
+            <a href="help.html">Help Docs</a>
+        </div>
+
+    </div>
+
+    <!-- BOTTOM BAR -->
+    <div class="footer-bottom">
+        © 2026 OFFICIAL KUCCPS HUB. All Rights Reserved.
+    </div>
+
+</footer>
+
+<style>
+    .main-footer {
+        background: linear-gradient(135deg, #020617, #0b1b3a);
+        color: white;
+        margin-top: 50px;
+        border-top: 1px solid rgba(56, 189, 248, 0.2);
+    }
+
+    .footer-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 30px;
+        padding: 40px 30px;
+    }
+
+    .footer-col {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .footer-col h3 {
+        margin-bottom: 15px;
+        font-size: 17px;
+        color: #38bdf8;
+    }
+
+    .footer-col a {
+        text-decoration: none;
+        color: #cbd5f5;
+        margin: 6px 0;
+        font-size: 14px;
+        transition: all 0.3s ease;
+    }
+
+    .footer-col a:hover {
+        color: #38bdf8;
+        padding-left: 6px;
+    }
+
+    .footer-brand p {
+        font-size: 14px;
+        margin: 6px 0;
+        color: #94a3b8;
+    }
+
+    .footer-logo {
+        width: 80px;
+        margin-bottom: 10px;
+    }
+
+    /* Bottom bar */
+    .footer-bottom {
+        background: #e3a64f;
+        text-align: center;
+        padding: 15px;
+        font-size: 13px;
+        color: black;
+        border-top: 1px solid rgba(56, 189, 248, 0.15);
+    }
+</style>
+<!-- ===== FOOTER END ===== -->
+
+</html>
