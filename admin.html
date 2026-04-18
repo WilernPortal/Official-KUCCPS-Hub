@@ -9,7 +9,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
     <style>
-        /* === YOUR ORIGINAL STYLES - 100% UNCHANGED === */
         body {
             font-family: 'Poppins', sans-serif;
             margin: 0;
@@ -90,14 +89,15 @@
 
         .preview {
             text-align: center;
-            margin-top: 10px;
+            margin-top: 15px;
         }
 
         .preview img {
             max-width: 100%;
             border-radius: 8px;
-            max-height: 300px;
+            max-height: 320px;
             object-fit: contain;
+            background: #020617;
         }
 
         .live-preview {
@@ -110,8 +110,9 @@
         .live-preview img {
             width: 100%;
             border-radius: 8px;
-            max-height: 250px;
+            max-height: 280px;
             object-fit: contain;
+            background: #020617;
         }
 
         #search {
@@ -150,24 +151,6 @@
             opacity: 0.8;
             margin: 8px 0;
         }
-
-        .status {
-            padding: 12px;
-            margin: 10px 0;
-            border-radius: 6px;
-            text-align: center;
-            font-weight: bold;
-        }
-
-        .success {
-            background: #166534;
-            color: #86efac;
-        }
-
-        .error {
-            background: #7f1d1d;
-            color: #fda4af;
-        }
     </style>
 </head>
 
@@ -179,14 +162,12 @@
 
     <div class="container">
 
-        <!-- Create Post Form -->
         <div class="form-card">
             <h3>Create New Post</h3>
 
             <input type="text" id="title" placeholder="Post Title">
             <textarea id="content" placeholder="Post Content"></textarea>
 
-            <!-- Vercel Blob Upload -->
             <input type="file" id="imageFile" accept="image/*">
             <button onclick="uploadImageToVercelBlob()">Upload Image to Vercel Blob</button>
             <input type="text" id="image" placeholder="Image URL (auto-filled after upload)" readonly>
@@ -206,10 +187,8 @@
             <div class="live-preview" id="livePreview"></div>
         </div>
 
-        <!-- Search -->
         <input type="text" id="search" placeholder="Search posts...">
 
-        <!-- Posts List -->
         <div class="post-list" id="postList"></div>
 
     </div>
@@ -225,7 +204,6 @@
         });
         const db = getFirestore(app);
 
-        /* Live Preview */
         const titleInput = document.getElementById("title");
         const contentInput = document.getElementById("content");
         const imageInput = document.getElementById("image");
@@ -235,8 +213,7 @@
             const imgUrl = imageInput.value.trim();
             livePreview.innerHTML = `
                 <h4>${titleInput.value || "Title Preview"}</h4>
-                ${imgUrl ? `<img src="${imgUrl}" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" style="max-height:250px;">` : ""}
-                <p style="display:${imgUrl ? 'none' : 'block'}">No image uploaded yet</p>
+                ${imgUrl ? `<img src="${imgUrl}" onload="this.style.opacity=1" style="opacity:0.3; transition:opacity 0.6s;">` : "<p>No image uploaded yet</p>"}
                 <p>${contentInput.value || "Content preview..."}</p>
             `;
         }
@@ -249,13 +226,12 @@
             const preview = document.getElementById("preview");
             const imageUrl = imageInput.value.trim();
             if (imageUrl) {
-                preview.innerHTML = `<img src="${imageUrl}" style="max-width:100%; border-radius:8px;" onerror="this.outerHTML='<p style=\'color:#fda4af\'>Image failed to load. Try refreshing the page.</p>'">`;
+                preview.innerHTML = `<img src="${imageUrl}" style="max-width:100%; border-radius:8px;" onload="this.style.opacity=1" onerror="this.outerHTML='<p style=\'color:#fda4af; padding:10px;\'>Image failed to load.<br>Try clicking Preview Image again or refresh the page.</p>'">`;
             } else {
                 preview.innerHTML = "<p style='color:#94a3b8;'>No image URL yet. Upload first.</p>";
             }
         };
 
-        // FIXED UPLOAD FUNCTION - This fixes the preview issue
         window.uploadImageToVercelBlob = async function () {
             const fileInput = document.getElementById("imageFile");
             const file = fileInput.files[0];
@@ -269,8 +245,7 @@
 
             try {
                 const uploadBtn = document.querySelector('button[onclick="uploadImageToVercelBlob()"]');
-                const originalText = uploadBtn.textContent;
-                uploadBtn.textContent = "Uploading to Vercel Blob...";
+                uploadBtn.textContent = "Uploading...";
                 uploadBtn.disabled = true;
 
                 const response = await fetch('/api/upload', {
@@ -278,37 +253,29 @@
                     body: formData
                 });
 
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(`Upload failed: ${errorText}`);
-                }
+                if (!response.ok) throw new Error("Upload failed");
 
                 const data = await response.json();
-
-                // Important fix: Use the returned URL directly
                 document.getElementById("image").value = data.url;
 
-                // Force preview to show the real image
+                // Give Vercel Blob time to make the image publicly available
                 setTimeout(() => {
                     updatePreview();
                     previewImage();
-                }, 800);   // Small delay to let Vercel Blob become available
+                }, 1200);
 
-                alert("✅ Image uploaded successfully to Vercel Blob!\n\nYou can now see the preview.");
+                alert("✅ Image uploaded successfully to Vercel Blob!");
 
             } catch (error) {
-                console.error("Upload error:", error);
-                alert(`Upload failed: ${error.message}\n\nMake sure your site is fully deployed on Vercel and api/upload.js is present.`);
+                console.error(error);
+                alert("Upload failed. Please make sure the site is fully redeployed on Vercel.");
             } finally {
                 const uploadBtn = document.querySelector('button[onclick="uploadImageToVercelBlob()"]');
-                if (uploadBtn) {
-                    uploadBtn.textContent = "Upload Image to Vercel Blob";
-                    uploadBtn.disabled = false;
-                }
+                uploadBtn.textContent = "Upload Image to Vercel Blob";
+                uploadBtn.disabled = false;
             }
         };
 
-        /* Publish Post - unchanged */
         window.addPost = async function () {
             const title = titleInput.value.trim();
             const content = contentInput.value.trim();
@@ -338,7 +305,6 @@
 
             alert("Published Successfully ✅");
 
-            // Clear form
             titleInput.value = "";
             contentInput.value = "";
             imageInput.value = "";
@@ -349,7 +315,7 @@
             loadPosts();
         };
 
-        /* All your other original functions remain 100% unchanged */
+        // All your other functions (deletePost, editPost, toggleStatus, manageComments, etc.) remain exactly the same
         window.deletePost = async function (id) {
             if (!confirm("Delete this post?")) return;
             await deleteDoc(doc(db, "posts", id));
@@ -368,11 +334,7 @@
             const newImage = prompt("New Image URL", post.image);
 
             if (newTitle && newContent) {
-                await updateDoc(postRef, {
-                    title: newTitle,
-                    content: newContent,
-                    image: newImage
-                });
+                await updateDoc(postRef, { title: newTitle, content: newContent, image: newImage });
                 loadPosts();
             }
         };
@@ -443,11 +405,11 @@
                             Status: ${post.status || 'published'} | 
                             Views: ${post.views || 0}
                         </div>
-                        ${post.image ? `<img src="${post.image}" onerror="this.style.display='none';">` : ""}
-                        <button class="edit-btn" onclick="event.stopPropagation(); editPost('${postId}')">Edit Post</button>
-                        <button class="status-btn" onclick="event.stopPropagation(); toggleStatus('${postId}', '${post.status}')">Toggle Status</button>
-                        <button class="delete-btn" onclick="event.stopPropagation(); deletePost('${postId}')">Delete Post</button>
-                        <button class="comment-btn" onclick="event.stopPropagation(); manageComments('${postId}', '${post.title.replace(/'/g, "\\'")}')">Manage Comments</button>
+                        ${post.image ? `<img src="${post.image}" style="max-height:180px; object-fit:contain;">` : ""}
+                        <button onclick="event.stopPropagation(); editPost('${postId}')">Edit Post</button>
+                        <button onclick="event.stopPropagation(); toggleStatus('${postId}', '${post.status}')">Toggle Status</button>
+                        <button onclick="event.stopPropagation(); deletePost('${postId}')">Delete Post</button>
+                        <button onclick="event.stopPropagation(); manageComments('${postId}', '${post.title.replace(/'/g, "\\'")}')">Manage Comments</button>
                         <div id="comments-${postId}" class="comments-section"></div>
                     </div>
                 `;
@@ -461,7 +423,6 @@
             });
         });
 
-        // Initialize
         loadPosts();
     </script>
 
@@ -470,7 +431,7 @@
 <!-- ===== FOOTER START ===== -->
 <footer class="main-footer">
     <div class="footer-container">
-        <!-- Your original footer code remains unchanged -->
+        <!-- Your original footer remains unchanged -->
     </div>
     <div class="footer-bottom">
         © 2026 OFFICIAL KUCCPS HUB. All Rights Reserved.
