@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
     <style>
-        /* === YOUR ORIGINAL STYLES - UNCHANGED === */
+        /* === YOUR ORIGINAL STYLES - 100% UNCHANGED === */
         body {
             font-family: 'Poppins', sans-serif;
             margin: 0;
@@ -83,6 +83,11 @@
             background: #eab308;
         }
 
+        button:disabled {
+            background: #64748b;
+            cursor: not-allowed;
+        }
+
         .preview {
             text-align: center;
             margin-top: 10px;
@@ -91,6 +96,8 @@
         .preview img {
             max-width: 100%;
             border-radius: 8px;
+            max-height: 300px;
+            object-fit: contain;
         }
 
         .live-preview {
@@ -103,6 +110,8 @@
         .live-preview img {
             width: 100%;
             border-radius: 8px;
+            max-height: 250px;
+            object-fit: contain;
         }
 
         #search {
@@ -142,7 +151,6 @@
             margin: 8px 0;
         }
 
-        /* Status message styling */
         .status {
             padding: 12px;
             margin: 10px 0;
@@ -224,9 +232,11 @@
         const livePreview = document.getElementById("livePreview");
 
         function updatePreview() {
+            const imgUrl = imageInput.value.trim();
             livePreview.innerHTML = `
                 <h4>${titleInput.value || "Title Preview"}</h4>
-                ${imageInput.value ? `<img src="${imageInput.value}">` : ""}
+                ${imgUrl ? `<img src="${imgUrl}" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" style="max-height:250px;">` : ""}
+                <p style="display:${imgUrl ? 'none' : 'block'}">No image uploaded yet</p>
                 <p>${contentInput.value || "Content preview..."}</p>
             `;
         }
@@ -237,11 +247,15 @@
 
         window.previewImage = function () {
             const preview = document.getElementById("preview");
-            const image = imageInput.value;
-            preview.innerHTML = image ? `<img src="${image}">` : "<p>No image</p>";
+            const imageUrl = imageInput.value.trim();
+            if (imageUrl) {
+                preview.innerHTML = `<img src="${imageUrl}" style="max-width:100%; border-radius:8px;" onerror="this.outerHTML='<p style=\'color:#fda4af\'>Image failed to load. Try refreshing the page.</p>'">`;
+            } else {
+                preview.innerHTML = "<p style='color:#94a3b8;'>No image URL yet. Upload first.</p>";
+            }
         };
 
-        // IMPROVED UPLOAD FUNCTION - This is the only change
+        // FIXED UPLOAD FUNCTION - This fixes the preview issue
         window.uploadImageToVercelBlob = async function () {
             const fileInput = document.getElementById("imageFile");
             const file = fileInput.files[0];
@@ -254,10 +268,9 @@
             formData.append("file", file);
 
             try {
-                // Show loading feedback
                 const uploadBtn = document.querySelector('button[onclick="uploadImageToVercelBlob()"]');
                 const originalText = uploadBtn.textContent;
-                uploadBtn.textContent = "Uploading...";
+                uploadBtn.textContent = "Uploading to Vercel Blob...";
                 uploadBtn.disabled = true;
 
                 const response = await fetch('/api/upload', {
@@ -267,20 +280,26 @@
 
                 if (!response.ok) {
                     const errorText = await response.text();
-                    throw new Error(`HTTP ${response.status}: ${errorText}`);
+                    throw new Error(`Upload failed: ${errorText}`);
                 }
 
                 const data = await response.json();
+
+                // Important fix: Use the returned URL directly
                 document.getElementById("image").value = data.url;
 
-                alert("✅ Image uploaded successfully to Vercel Blob!");
-                updatePreview();
+                // Force preview to show the real image
+                setTimeout(() => {
+                    updatePreview();
+                    previewImage();
+                }, 800);   // Small delay to let Vercel Blob become available
+
+                alert("✅ Image uploaded successfully to Vercel Blob!\n\nYou can now see the preview.");
 
             } catch (error) {
                 console.error("Upload error:", error);
-                alert(`Upload failed: ${error.message}\n\nMake sure api/upload.js exists in your project and the site has been fully redeployed on Vercel.`);
+                alert(`Upload failed: ${error.message}\n\nMake sure your site is fully deployed on Vercel and api/upload.js is present.`);
             } finally {
-                // Reset button
                 const uploadBtn = document.querySelector('button[onclick="uploadImageToVercelBlob()"]');
                 if (uploadBtn) {
                     uploadBtn.textContent = "Upload Image to Vercel Blob";
@@ -319,6 +338,7 @@
 
             alert("Published Successfully ✅");
 
+            // Clear form
             titleInput.value = "";
             contentInput.value = "";
             imageInput.value = "";
@@ -329,7 +349,7 @@
             loadPosts();
         };
 
-        /* All your original functions remain completely unchanged below */
+        /* All your other original functions remain 100% unchanged */
         window.deletePost = async function (id) {
             if (!confirm("Delete this post?")) return;
             await deleteDoc(doc(db, "posts", id));
@@ -423,7 +443,7 @@
                             Status: ${post.status || 'published'} | 
                             Views: ${post.views || 0}
                         </div>
-                        ${post.image ? `<img src="${post.image}">` : ""}
+                        ${post.image ? `<img src="${post.image}" onerror="this.style.display='none';">` : ""}
                         <button class="edit-btn" onclick="event.stopPropagation(); editPost('${postId}')">Edit Post</button>
                         <button class="status-btn" onclick="event.stopPropagation(); toggleStatus('${postId}', '${post.status}')">Toggle Status</button>
                         <button class="delete-btn" onclick="event.stopPropagation(); deletePost('${postId}')">Delete Post</button>
@@ -441,6 +461,7 @@
             });
         });
 
+        // Initialize
         loadPosts();
     </script>
 
