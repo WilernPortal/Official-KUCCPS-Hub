@@ -6,12 +6,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OFFICIAL KUCCPS HUB | Updates</title>
 
-    <!-- Default OG Tags with IDs for dynamic rich preview -->
-    <meta property="og:title" id="ogTitle" content="OFFICIAL KUCCPS HUB Updates">
-    <meta property="og:description" id="ogDescription" content="Latest KUCCPS updates, applications & university news">
+    <!-- Improved OG Meta Tags for Rich Preview (WhatsApp, Facebook, etc.) -->
+    <meta property="og:title" id="ogTitle" content="OFFICIAL KUCCPS HUB | Latest Updates">
+    <meta property="og:description" id="ogDescription"
+        content="Latest KUCCPS updates, university admissions, scholarships and important announcements for Kenyan students.">
     <meta property="og:image" id="ogImage" content="https://images.unsplash.com/photo-1523240795612-9a054b0db644">
     <meta property="og:type" content="article">
     <meta property="og:url" id="ogUrl" content="">
+    <meta property="og:site_name" content="OFFICIAL KUCCPS HUB">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" id="twitterTitle" content="OFFICIAL KUCCPS HUB | Latest Updates">
+    <meta name="twitter:description" id="twitterDescription"
+        content="Latest KUCCPS updates, university admissions, scholarships and important announcements for Kenyan students.">
+    <meta name="twitter:image" id="twitterImage" content="https://images.unsplash.com/photo-1523240795612-9a054b0db644">
 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
@@ -123,7 +132,6 @@
             }
         }
 
-        /* All other styles remain exactly as you provided */
         .container {
             padding: 30px;
         }
@@ -291,7 +299,7 @@
             font-size: 10px;
         }
 
-        /* Single Post styles remain unchanged */
+        /* Single Post styles */
         #singlePost {
             max-width: 820px;
             margin: 0 auto;
@@ -468,7 +476,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-        import { getFirestore, collection, doc, updateDoc, increment, addDoc, onSnapshot, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+        import { getFirestore, collection, doc, updateDoc, increment, addDoc, onSnapshot, getDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
 
         const app = initializeApp({
@@ -496,11 +504,9 @@
         let userSavedPosts = [];
         let currentUsername = "";
         let currentUserUid = null;
-        let userLikedPosts = []; // To prevent multiple likes
+        let userLikedPosts = [];
 
-        // ===============================
-        // ACCOUNT-BASED NOTIFICATION SYSTEM
-        // ===============================
+        // ACCOUNT-BASED NOTIFICATION SYSTEM (100% unchanged)
         let notifications = [];
 
         async function loadNotifications() {
@@ -517,13 +523,7 @@
         }
 
         function addNotification(message, postId = null) {
-            notifications.unshift({
-                id: Date.now(),
-                message,
-                postId,
-                time: new Date().toISOString(),
-                read: false
-            });
+            notifications.unshift({ id: Date.now(), message, postId, time: new Date().toISOString(), read: false });
             saveNotifications();
         }
 
@@ -571,9 +571,7 @@
                 div.onclick = () => {
                     notifications[index].read = true;
                     saveNotifications();
-                    if (n.postId && window.showSinglePost) {
-                        window.showSinglePost(n.postId);
-                    }
+                    if (n.postId && window.showSinglePost) window.showSinglePost(n.postId);
                     document.getElementById("notifPanel").style.display = "none";
                 };
                 listEl.appendChild(div);
@@ -611,10 +609,6 @@
             showToast("All notifications cleared");
         }
 
-        // ===============================
-        // Rest of your original code (100% unchanged)
-        // ===============================
-
         function showToast(msg) {
             const t = document.getElementById("toast");
             t.innerText = msg;
@@ -641,6 +635,33 @@
             return postDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
         }
 
+        // IMPORTANT: Update OG Tags when shared link is opened
+        function updateMetaForSharedPost() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const postId = urlParams.get('post');
+            if (!postId) return;
+
+            setTimeout(() => {
+                const post = allPosts.find(p => p.id === postId);
+                if (post) {
+                    const baseUrl = window.location.href.split('?')[0];
+                    const postUrl = `${baseUrl}?post=${postId}`;
+
+                    document.getElementById("ogTitle").setAttribute("content", post.title || "KUCCPS Update");
+                    document.getElementById("ogDescription").setAttribute("content", (post.content || "").substring(0, 160) + "...");
+                    document.getElementById("ogUrl").setAttribute("content", postUrl);
+                    document.getElementById("twitterTitle").setAttribute("content", post.title || "KUCCPS Update");
+                    document.getElementById("twitterDescription").setAttribute("content", (post.content || "").substring(0, 160) + "...");
+
+                    if (post.image) {
+                        document.getElementById("ogImage").setAttribute("content", post.image);
+                        document.getElementById("twitterImage").setAttribute("content", post.image);
+                    }
+                    document.title = post.title || "OFFICIAL KUCCPS HUB | Updates";
+                }
+            }, 1200);
+        }
+
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUserUid = user.uid;
@@ -651,13 +672,9 @@
 
                 const nameParts = currentUsername.trim().split(/\s+/);
                 let initials = "";
-                if (nameParts.length >= 2) {
-                    initials = (nameParts[0][0] + nameParts[1][0]).toUpperCase();
-                } else if (nameParts.length === 1) {
-                    initials = nameParts[0][0].toUpperCase();
-                } else {
-                    initials = "MO";
-                }
+                if (nameParts.length >= 2) initials = (nameParts[0][0] + nameParts[1][0]).toUpperCase();
+                else if (nameParts.length === 1) initials = nameParts[0][0].toUpperCase();
+                else initials = "MO";
 
                 authSection.innerHTML = `
                     <span>Welcome, <strong>${initials}</strong></span>
@@ -744,6 +761,7 @@
                 allPosts.sort((a, b) => new Date(b.createdAt || b.timestamp || 0) - new Date(a.createdAt || a.timestamp || 0));
                 originalPosts = [...allPosts];
                 renderPosts();
+                updateMetaForSharedPost();
             });
         }
 
@@ -845,7 +863,6 @@
                 showToast("You have already liked this post");
                 return;
             }
-
             await updateDoc(doc(db, "posts", id), { likes: increment(1) });
             userLikedPosts.push(id);
             await updateDoc(doc(db, "users", currentUserUid), { likedPosts: userLikedPosts });
@@ -874,11 +891,16 @@
             const baseUrl = window.location.href.split('?')[0];
             const postUrl = `${baseUrl}?post=${id}`;
 
+            // Update meta tags for rich preview
             document.getElementById("ogTitle").setAttribute("content", p.title || "KUCCPS Update");
             document.getElementById("ogDescription").setAttribute("content", (p.content || "").substring(0, 160) + "...");
             document.getElementById("ogUrl").setAttribute("content", postUrl);
+            document.getElementById("twitterTitle").setAttribute("content", p.title || "KUCCPS Update");
+            document.getElementById("twitterDescription").setAttribute("content", (p.content || "").substring(0, 160) + "...");
+
             if (p.image) {
                 document.getElementById("ogImage").setAttribute("content", p.image);
+                document.getElementById("twitterImage").setAttribute("content", p.image);
             }
             document.title = p.title || "OFFICIAL KUCCPS HUB | Updates";
 
@@ -1014,6 +1036,7 @@
             document.getElementById("mainNav").classList.toggle("show");
         };
 
+        // Initialize
         typeEffect();
         loadPosts();
         loadNotifications();
@@ -1024,7 +1047,6 @@
 <!-- ===== FOOTER START ===== -->
 <footer class="main-footer">
     <div class="footer-container">
-        <!-- LOGO + CONTACT -->
         <div class="footer-col footer-brand">
             <img src="images/logo.jpeg" alt="Logo" class="footer-logo">
             <p><strong>OFFICIAL KUCCPS HUB</strong></p>
@@ -1034,7 +1056,6 @@
             <p>📧 officialkuccpshub.co.ke@gmail.com</p>
         </div>
 
-        <!-- PROJECTS -->
         <div class="footer-col">
             <h3>Projects</h3>
             <a href="#">KUCCPS Application Support</a>
@@ -1048,7 +1069,6 @@
             <a href="#">Edulum Students Portal</a>
         </div>
 
-        <!-- QUICK LINKS -->
         <div class="footer-col">
             <h3>Quick Links</h3>
             <a href="blog.html">Latest Updates</a>
@@ -1063,7 +1083,6 @@
             <a href="faq.html">FAQs</a>
         </div>
 
-        <!-- RESOURCES -->
         <div class="footer-col">
             <h3>Resources</h3>
             <a href="https://students.kuccps.net/login">KUCCPS Portal</a>
@@ -1077,7 +1096,6 @@
         </div>
     </div>
 
-    <!-- BOTTOM BAR -->
     <div class="footer-bottom">
         © 2026 OFFICIAL KUCCPS HUB. All Rights Reserved.
     </div>
@@ -1142,6 +1160,5 @@
         border-top: 1px solid rgba(56, 189, 248, 0.15);
     }
 </style>
-<!-- ===== FOOTER END ===== -->
 
 </html>
