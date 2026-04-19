@@ -213,7 +213,7 @@
             const imgUrl = imageInput.value.trim();
             livePreview.innerHTML = `
                 <h4>${titleInput.value || "Title Preview"}</h4>
-                ${imgUrl ? `<img src="${imgUrl}" onload="this.style.opacity=1" style="opacity:0.3; transition:opacity 0.6s;">` : "<p>No image uploaded yet</p>"}
+                ${imgUrl ? `<img src="${imgUrl}" style="max-height:280px; object-fit:contain; opacity:1;" onload="this.style.opacity=1">` : "<p>No image uploaded yet</p>"}
                 <p>${contentInput.value || "Content preview..."}</p>
             `;
         }
@@ -226,12 +226,13 @@
             const preview = document.getElementById("preview");
             const imageUrl = imageInput.value.trim();
             if (imageUrl) {
-                preview.innerHTML = `<img src="${imageUrl}" style="max-width:100%; border-radius:8px;" onload="this.style.opacity=1" onerror="this.outerHTML='<p style=\'color:#fda4af; padding:10px;\'>Image failed to load.<br>Try clicking Preview Image again or refresh the page.</p>'">`;
+                preview.innerHTML = `<img src="${imageUrl}" style="max-width:100%; border-radius:8px; max-height:320px; object-fit:contain;" onload="this.style.opacity=1" onerror="this.outerHTML='<p style=\'color:#fda4af; padding:10px;\'>Image failed to load. Try uploading again.</p>'">`;
             } else {
                 preview.innerHTML = "<p style='color:#94a3b8;'>No image URL yet. Upload first.</p>";
             }
         };
 
+        // Upload to Vercel Blob via API route
         window.uploadImageToVercelBlob = async function () {
             const fileInput = document.getElementById("imageFile");
             const file = fileInput.files[0];
@@ -240,14 +241,14 @@
                 return;
             }
 
+            const uploadBtn = document.querySelector('button[onclick="uploadImageToVercelBlob()"]');
+            uploadBtn.textContent = "Uploading...";
+            uploadBtn.disabled = true;
+
             const formData = new FormData();
             formData.append("file", file);
 
             try {
-                const uploadBtn = document.querySelector('button[onclick="uploadImageToVercelBlob()"]');
-                uploadBtn.textContent = "Uploading...";
-                uploadBtn.disabled = true;
-
                 const response = await fetch('/api/upload', {
                     method: 'POST',
                     body: formData
@@ -258,19 +259,18 @@
                 const data = await response.json();
                 document.getElementById("image").value = data.url;
 
-                // Give Vercel Blob time to make the image publicly available
+                // Small delay to ensure Vercel Blob makes the image public
                 setTimeout(() => {
                     updatePreview();
                     previewImage();
-                }, 1200);
+                }, 1500);
 
                 alert("✅ Image uploaded successfully to Vercel Blob!");
 
             } catch (error) {
                 console.error(error);
-                alert("Upload failed. Please make sure the site is fully redeployed on Vercel.");
+                alert("Upload failed. Make sure the site is fully redeployed on Vercel and api/upload.js exists.");
             } finally {
-                const uploadBtn = document.querySelector('button[onclick="uploadImageToVercelBlob()"]');
                 uploadBtn.textContent = "Upload Image to Vercel Blob";
                 uploadBtn.disabled = false;
             }
@@ -305,6 +305,7 @@
 
             alert("Published Successfully ✅");
 
+            // Clear form
             titleInput.value = "";
             contentInput.value = "";
             imageInput.value = "";
@@ -315,7 +316,7 @@
             loadPosts();
         };
 
-        // All your other functions (deletePost, editPost, toggleStatus, manageComments, etc.) remain exactly the same
+        /* All your other original functions remain exactly the same */
         window.deletePost = async function (id) {
             if (!confirm("Delete this post?")) return;
             await deleteDoc(doc(db, "posts", id));
