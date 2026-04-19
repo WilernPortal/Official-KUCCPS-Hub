@@ -232,6 +232,7 @@
             }
         };
 
+        // Improved upload with longer delay
         window.uploadImageToVercelBlob = async function () {
             const fileInput = document.getElementById("imageFile");
             const file = fileInput.files[0];
@@ -258,17 +259,16 @@
                 const data = await response.json();
                 document.getElementById("image").value = data.url;
 
-                // Longer delay for Vercel Blob to make image public
+                // 3-second delay to ensure Vercel Blob makes the image public
                 setTimeout(() => {
                     updatePreview();
                     previewImage();
-                }, 2000);
-
-                alert("✅ Image uploaded successfully to Vercel Blob!");
+                    alert("✅ Image uploaded successfully! Preview should now show the real image.");
+                }, 3000);
 
             } catch (error) {
                 console.error(error);
-                alert("Upload failed. Make sure the site is fully redeployed.");
+                alert("Upload failed. Make sure the site is fully redeployed on Vercel.");
             } finally {
                 uploadBtn.textContent = "Upload Image to Vercel Blob";
                 uploadBtn.disabled = false;
