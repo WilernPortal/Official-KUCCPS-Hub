@@ -211,11 +211,18 @@
 
         function updatePreview() {
             const imgUrl = imageInput.value.trim();
+            const cacheBusted = imgUrl ? imgUrl + "?t=" + Date.now() : "";
+
             livePreview.innerHTML = `
-                <h4>${titleInput.value || "Title Preview"}</h4>
-                ${imgUrl ? `<img src="${imgUrl}" style="max-height:280px; object-fit:contain;" onload="this.style.opacity=1" onerror="this.style.display='none'">` : "<p>No image uploaded yet</p>"}
-                <p>${contentInput.value || "Content preview..."}</p>
-            `;
+        <h4>${titleInput.value || "Title Preview"}</h4>
+        ${imgUrl
+                    ? `<img src="${cacheBusted}" 
+                    style="max-height:280px; object-fit:contain;"
+                    onerror="this.style.display='none'">`
+                    : "<p>No image uploaded yet</p>"
+                }
+        <p>${contentInput.value || "Content preview..."}</p>
+    `;
         }
 
         titleInput.addEventListener("input", updatePreview);
@@ -225,17 +232,38 @@
         window.previewImage = function () {
             const preview = document.getElementById("preview");
             const imageUrl = imageInput.value.trim();
+
             if (imageUrl) {
-                preview.innerHTML = `<img src="${imageUrl}" style="max-width:100%; border-radius:8px; max-height:320px; object-fit:contain;" onload="this.style.opacity=1" onerror="this.outerHTML='<p style=\'color:#fda4af; padding:10px;\'>Image failed to load. Try uploading again.</p>'">`;
+                const cacheBusted = imageUrl + "?t=" + Date.now();
+
+                preview.innerHTML = `
+            <img src="${cacheBusted}" 
+                 style="max-width:100%; border-radius:8px; max-height:320px; object-fit:contain;"
+                 onerror="this.outerHTML='<p style=color:#fda4af>Image not ready yet. Try again.</p>'">
+        `;
             } else {
                 preview.innerHTML = "<p style='color:#94a3b8;'>No image URL yet. Upload first.</p>";
             }
         };
 
-        // Improved upload with longer delay
+        // 🔥 NEW: Wait until image is actually available
+        async function waitForImage(url, retries = 10) {
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const res = await fetch(url, { method: "HEAD", cache: "no-store" });
+                    if (res.ok) return true;
+                } catch (e) { }
+
+                await new Promise(r => setTimeout(r, 1500));
+            }
+            return false;
+        }
+
+        // 🔥 FIXED upload (NO more blind delay)
         window.uploadImageToVercelBlob = async function () {
             const fileInput = document.getElementById("imageFile");
             const file = fileInput.files[0];
+
             if (!file) {
                 alert("Please select an image file first");
                 return;
@@ -257,18 +285,26 @@
                 if (!response.ok) throw new Error("Upload failed");
 
                 const data = await response.json();
-                document.getElementById("image").value = data.url;
+                const imageUrl = data.url;
 
-                // 3-second delay to ensure Vercel Blob makes the image public
-                setTimeout(() => {
+                document.getElementById("image").value = imageUrl;
+
+                alert("⏳ Waiting for image to be ready...");
+
+                // 🔥 WAIT until image is ACTUALLY accessible
+                const ready = await waitForImage(imageUrl);
+
+                if (ready) {
                     updatePreview();
                     previewImage();
-                    alert("✅ Image uploaded successfully! Preview should now show the real image.");
-                }, 3000);
+                    alert("✅ Image uploaded and ready!");
+                } else {
+                    alert("⚠️ Image uploaded but not ready yet. Click preview again.");
+                }
 
             } catch (error) {
                 console.error(error);
-                alert("Upload failed. Make sure the site is fully redeployed on Vercel.");
+                alert("Upload failed. Make sure Vercel is deployed.");
             } finally {
                 uploadBtn.textContent = "Upload Image to Vercel Blob";
                 uploadBtn.disabled = false;
