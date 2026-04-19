@@ -1,10 +1,8 @@
-// api/upload.js - Final reliable version for Vercel Blob
+// api/upload.js - Simple and reliable Vercel Blob upload
 import { put } from '@vercel/blob';
 
 export const config = {
-    api: {
-        bodyParser: false,
-    },
+    runtime: 'nodejs',
 };
 
 export default async function handler(req, res) {
@@ -13,26 +11,29 @@ export default async function handler(req, res) {
     }
 
     try {
-        // Read FormData correctly
-        const formData = await req.formData();
-        const file = formData.get('file');
+        // Get the raw body as buffer (this works better for file uploads)
+        const chunks = [];
+        for await (const chunk of req) {
+            chunks.push(chunk);
+        }
+        const buffer = Buffer.concat(chunks);
 
-        if (!file) {
-            return res.status(400).json({ error: 'No file received from client' });
+        // Basic check - we expect a file in the request
+        if (buffer.length === 0) {
+            return res.status(400).json({ error: 'No file received' });
         }
 
-        // Create safe filename
+        // Create a filename
         const timestamp = Date.now();
-        const extension = file.name.split('.').pop() || 'jpg';
-        const filename = `kuccps-post-${timestamp}.${extension}`;
+        const filename = `kuccps-${timestamp}.jpg`;   // You can improve this later
 
-        // Upload to Vercel Blob
-        const blob = await put(filename, file, {
-            access: 'public',
+        // Upload directly to Vercel Blob using the buffer
+        const blob = await put(filename, buffer, {
+            access: 'public',           // So images can be viewed by anyone
             addRandomSuffix: true,
         });
 
-        console.log('✅ Upload successful:', blob.url);
+        console.log('Upload successful:', blob.url);
 
         return res.status(200).json({
             url: blob.url,
@@ -40,7 +41,7 @@ export default async function handler(req, res) {
         });
 
     } catch (error) {
-        console.error('❌ Upload error:', error);
+        console.error('Upload error:', error);
         return res.status(500).json({
             error: error.message || 'Failed to upload image',
             success: false
