@@ -3,7 +3,7 @@ import { put } from '@vercel/blob';
 
 export const config = {
     api: {
-        bodyParser: false,   // Important for file uploads
+        bodyParser: false,   // Required for file uploads
     },
 };
 
@@ -13,26 +13,26 @@ export default async function handler(req, res) {
     }
 
     try {
-        // Get the uploaded file from FormData
-        const formData = await req.formData ? req.formData() : new FormData();
+        // Get the file from FormData
+        const formData = await req.formData();
         const file = formData.get('file');
 
         if (!file) {
-            return res.status(400).json({ error: 'No file uploaded' });
+            return res.status(400).json({ error: 'No file received' });
         }
 
-        // Create a clean filename with timestamp
+        // Create a clean filename
         const timestamp = Date.now();
         const extension = file.name.split('.').pop() || 'jpg';
         const filename = `kuccps-post-${timestamp}.${extension}`;
 
         // Upload to Vercel Blob
         const blob = await put(filename, file, {
-            access: 'public',           // Makes the image publicly viewable
-            addRandomSuffix: true,      // Adds extra safety
+            access: 'public',
+            addRandomSuffix: true,
         });
 
-        console.log('✅ Image uploaded successfully:', blob.url);
+        console.log('✅ Upload successful:', blob.url);
 
         return res.status(200).json({
             url: blob.url,
@@ -42,7 +42,7 @@ export default async function handler(req, res) {
     } catch (error) {
         console.error('❌ Upload error:', error);
         return res.status(500).json({
-            error: error.message || 'Failed to upload image to Vercel Blob',
+            error: error.message || 'Failed to upload image',
             success: false
         });
     }
