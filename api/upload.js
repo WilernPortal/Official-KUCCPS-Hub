@@ -1,9 +1,9 @@
-// api/upload.js - Reliable Vercel Blob upload for admin.html
+// api/upload.js - Final reliable version for Vercel Blob
 import { put } from '@vercel/blob';
 
 export const config = {
     api: {
-        bodyParser: false,   // Required for file uploads
+        bodyParser: false,
     },
 };
 
@@ -13,15 +13,15 @@ export default async function handler(req, res) {
     }
 
     try {
-        // Get the file from FormData
+        // Read FormData correctly
         const formData = await req.formData();
         const file = formData.get('file');
 
         if (!file) {
-            return res.status(400).json({ error: 'No file received' });
+            return res.status(400).json({ error: 'No file received from client' });
         }
 
-        // Create a clean filename
+        // Create safe filename
         const timestamp = Date.now();
         const extension = file.name.split('.').pop() || 'jpg';
         const filename = `kuccps-post-${timestamp}.${extension}`;
