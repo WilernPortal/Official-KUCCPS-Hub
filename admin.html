@@ -213,7 +213,7 @@
             const imgUrl = imageInput.value.trim();
             livePreview.innerHTML = `
                 <h4>${titleInput.value || "Title Preview"}</h4>
-                ${imgUrl ? `<img src="${imgUrl}" style="max-height:280px; object-fit:contain; opacity:1;" onload="this.style.opacity=1">` : "<p>No image uploaded yet</p>"}
+                ${imgUrl ? `<img src="${imgUrl}" style="max-height:280px; object-fit:contain;" onload="this.style.opacity=1" onerror="this.style.display='none'">` : "<p>No image uploaded yet</p>"}
                 <p>${contentInput.value || "Content preview..."}</p>
             `;
         }
@@ -232,7 +232,6 @@
             }
         };
 
-        // Upload using your working upload.js
         window.uploadImageToVercelBlob = async function () {
             const fileInput = document.getElementById("imageFile");
             const file = fileInput.files[0];
@@ -259,17 +258,17 @@
                 const data = await response.json();
                 document.getElementById("image").value = data.url;
 
-                // Small delay so Vercel Blob makes image public
+                // Longer delay for Vercel Blob to make image public
                 setTimeout(() => {
                     updatePreview();
                     previewImage();
-                }, 1500);
+                }, 2000);
 
                 alert("✅ Image uploaded successfully to Vercel Blob!");
 
             } catch (error) {
                 console.error(error);
-                alert("Upload failed. Make sure the site is fully redeployed on Vercel.");
+                alert("Upload failed. Make sure the site is fully redeployed.");
             } finally {
                 uploadBtn.textContent = "Upload Image to Vercel Blob";
                 uploadBtn.disabled = false;
